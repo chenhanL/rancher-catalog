@@ -1,0 +1,42 @@
+version: '2'
+services:
+  registry:
+    scale: 1
+    start_on_create: true
+#  proxy:
+#    scale: 1
+#    start_on_create: true
+  jobservice:
+    scale: 1
+    start_on_create: true
+  adminserver:
+    scale: 1
+    start_on_create: true
+  ui:
+    scale: 1
+    start_on_create: true
+#  log:
+#    start_on_create: true
+  harbor-lb:
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - protocol: http
+        service: proxy
+        source_port: 8080
+        target_port: 80
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+  #mysql:
+  #  scale: 1
+  #  start_on_create: true
+  harbor-setupwrapper:
+    scale: 1
+    start_on_create: true
+

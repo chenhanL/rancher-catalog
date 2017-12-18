@@ -1,0 +1,243 @@
+version: '2'
+volumes:
+  etcjobservice:
+    driver: rancher-nfs
+  configjobservice:
+    driver: rancher-nfs
+  configadminserver:
+    driver: rancher-nfs
+  data:
+    driver: rancher-nfs
+  etcregistry:
+    driver: rancher-nfs
+  data-ca_download:
+    driver: rancher-nfs
+  data-job_logs:
+    driver: rancher-nfs
+  configdb:
+    driver: rancher-nfs
+  etcui:
+    driver: rancher-nfs
+  data-config:
+    driver: rancher-nfs
+  etcnginx:
+    driver: rancher-nfs
+  data-registry:
+    driver: rancher-nfs
+  configui:
+    driver: rancher-nfs
+  data-database:
+    driver: rancher-nfs
+services:
+  registry:
+    image: vmware/registry:2.6.2-photon
+    environment:
+      GODEBUG: netdns=cgo
+    volumes:
+    - data-registry:/storage
+    - data:/data
+    - data-ca_download:/etc/ui/ca/
+    - data-config:/etc/adminserver/config/
+    - etcui:/etc/ui
+    - etcjobservice:/etc/jobservice
+    - etcregistry:/etc/registry
+    - etcnginx:/etc/nginx
+    - configdb:/configdb
+    - configui:/configui
+    - configjobservice:/configjobservice
+    - configadminserver:/configadminserver
+    logging:
+      driver: json-file
+      options:
+        max-size: "200m"
+    command:
+    - serve
+    - /etc/registry/config.yml
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.hostname_override: container_name
+#  proxy:
+#    image: vmware/nginx-photon:1.11.13
+#    volumes:
+#    - data-database:/var/lib/mysql
+#    - data:/data/:z
+#    - data-job_logs:/var/log/jobs
+#    - data-ca_download:/etc/ui/ca/
+#    - data-config:/etc/adminserver/config/
+#    - etcui:/etc/ui
+#    - etcjobservice:/etc/jobservice
+#    - etcregistry:/etc/registry
+#    - etcnginx:/etc/nginx
+#    - configdb:/configdb
+#    - configui:/configui
+#    - configjobservice:/configjobservice
+#    - configadminserver:/configadminserver
+#    logging:
+#      driver: json-file
+#      options:
+#        max-size: "200m"
+#    links:
+#    - ui:ui
+#    - adminserver:adminserver
+#    - jobservice:jobservice
+#    - registry:registry
+#    - mysql:mysql
+#    labels:
+#      io.rancher.scheduler.affinity:host_label: harbor=true
+#      io.rancher.container.hostname_override: container_name
+  jobservice:
+    image: vmware/harbor-jobservice:v1.2.2
+    entrypoint:
+    - /bin/sh
+    - -c
+    volumes:
+    - data:/data/:z
+    - data-job_logs:/var/log/jobs
+    - data-ca_download:/etc/ui/ca/
+    - data-config:/etc/adminserver/config/
+    - etcui:/etc/ui
+    - etcjobservice:/etc/jobservice
+    - etcregistry:/etc/registry
+    - etcnginx:/etc/nginx
+    - configdb:/configdb
+    - configui:/configui
+    - configjobservice:/configjobservice
+    - configadminserver:/configadminserver
+    logging:
+      driver: json-file
+      options:
+        max-size: "200m"
+    command:
+    - /configjobservice/entrypointjobservice.sh
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.hostname_override: container_name
+  adminserver:
+    image: vmware/harbor-adminserver:v1.2.2
+    entrypoint:
+    - /bin/sh
+    - -c
+    volumes:
+    - data-database:/var/lib/mysql
+    - data:/data/:z
+    - data-job_logs:/var/log/jobs
+    - data-ca_download:/etc/ui/ca/
+    - data-config:/etc/adminserver/config/
+    - etcui:/etc/ui
+    - etcjobservice:/etc/jobservice
+    - etcregistry:/etc/registry
+    - etcnginx:/etc/nginx
+    - configdb:/configdb
+    - configui:/configui
+    - configjobservice:/configjobservice
+    - configadminserver:/configadminserver
+    logging:
+      driver: json-file
+      options:
+        max-size: "200m"
+    command:
+    - /configadminserver/entrypointadminserver.sh
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.hostname_override: container_name
+  ui:
+    image: vmware/harbor-ui:v1.2.2
+    entrypoint:
+    - /bin/sh
+    - -c
+    volumes:
+    - data:/data/:z
+    - data-database:/var/lib/mysql
+    - data-job_logs:/var/log/jobs
+    - data-ca_download:/etc/ui/ca/
+    - data-config:/etc/adminserver/config/
+    - etcui:/etc/ui
+    - etcjobservice:/etc/jobservice
+    - etcregistry:/etc/registry
+    - etcnginx:/etc/nginx
+    - configdb:/configdb
+    - configui:/configui
+    - configjobservice:/configjobservice
+    - configadminserver:/configadminserver
+    logging:
+      driver: json-file
+      options:
+        max-size: "200m"
+    command:
+    - /configui/entrypointui.sh
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.hostname_override: container_name
+#  log:
+#    image: vmware/harbor-log:v1.1.1
+#    volumes:
+#    - /var/log/harbor/:/var/log/docker/:z
+#    ports:
+#    - 1514:514/tcp
+#    labels:
+#      io.rancher.scheduler.affinity:host_label: harbor=true
+#      io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+#      io.rancher.container.hostname_override: container_name
+#      io.rancher.scheduler.global: 'true'
+  harbor-lb:
+    image: rancher/lb-service-haproxy
+    ports:
+    - 8080:80/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.hostname_override: container_name
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'
+#  mysql:
+#    image: vmware/harbor-db:v1.1.1
+#    entrypoint:
+#    - /bin/sh
+#    - -c
+#    volumes:
+#    - data-database:/var/lib/mysql
+#    - data:/data:z
+#    - data-job_logs:/var/log/jobs
+#    - data-ca_download:/etc/ui/ca/
+#    - data-config:/etc/adminserver/config/
+#    - etcui:/etc/ui
+#    - etcjobservice:/etc/jobservice
+#    - etcregistry:/etc/registry
+#    - etcnginx:/etc/nginx
+#    - configdb:/configdb
+#    - configui:/configui
+#    - configjobservice:/configjobservice
+#    - configadminserver:/configadminserver
+#    logging:
+#      driver: syslog
+#      options:
+#        syslog-address: tcp://127.0.0.1:1514
+#        tag: mysql
+#    command:
+#    - /configdb/entrypointdb.sh
+#    labels:
+#      io.rancher.scheduler.affinity:host_label: harbor=true
+#      io.rancher.container.hostname_override: container_name
+  harbor-setupwrapper:
+    image: mreferre/harbor-setupwrapper:1.1.1-1
+    environment:
+      HARBORHOSTNAME: registry.sensetime.com.
+      HARBOR_ADMIN_PASSWORD: abc123.com
+    network_mode: none
+    volumes:
+    - data:/data
+    - etcui:/etc/ui
+    - etcjobservice:/etc/jobservice
+    - etcregistry:/etc/registry
+    - etcnginx:/etc/nginx
+    - configdb:/configdb
+    - configui:/configui
+    - configjobservice:/configjobservice
+    - configadminserver:/configadminserver
+    command:
+    - /harbor/harbor-setupwrapper.sh
+    labels:
+      io.rancher.scheduler.affinity:host_label: harbor=true
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.hostname_override: container_name
+
