@@ -1,3 +1,9 @@
-name: harbor
-version: 1.2.2
-maintainer: lining@sensetime.com
+---
+name: Harbor
+description: >
+  Harbor Stack for SenseTime Container Infrastructure.
+version: v1.2.2
+category: Registry
+maintainer: Lining <lining@sensetime.com>
+license: Apache2
+projectURL: https://github.com/chenhanL/rancher-catalog
