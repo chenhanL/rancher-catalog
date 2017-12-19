@@ -30,9 +30,9 @@ volumes: #most volumes mappings require optimization (now all volumes map all co
 #  data-registry:
 #    #external: true
 #    driver: ${volumedriver}
-  data-database:
-    #external: true
-    driver: ${volumedriver}
+#  data-database:
+#    #external: true
+#    driver: ${volumedriver}
   data-job_logs:
     #external: true
     driver: ${volumedriver}
@@ -183,7 +183,6 @@ services:
     restart: always
     volumes:
       - data:/data/:z
-      - data-database:/var/lib/mysql
       - data-job_logs:/var/log/jobs
       - data-ca_download:/etc/ui/ca/
       - data-config:/etc/adminserver/config/
