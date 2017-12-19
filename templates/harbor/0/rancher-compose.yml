@@ -118,8 +118,5 @@ services:
     scale: 1
   ui:
     scale: 1
-  mysql:
-    external_ips:
-    - 10.10.10.10
   harbor-setupwrapper:
     scale: 1
