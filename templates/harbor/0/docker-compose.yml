@@ -1,108 +1,48 @@
 version: '2'
 volumes: #most volumes mappings require optimization (now all volumes map all containers)
-  etcjobservice:
-    #external: true
+  harbor/adminservice:
+    external: true
     driver: ${volumedriver}
-#  etcnginx:
-#    #external: true
-#    driver: ${volumedriver}
-  etcregistry:
-    #external: true
+  harbor/jobservice:
+    external: true
     driver: ${volumedriver}
-  etcui:
-    #external: true
+  harbor/registry:
+    external: true
     driver: ${volumedriver}
-  configjobservice:
-    #external: true
-    driver: ${volumedriver}
-  configdb:
-    #external: true
-    driver: ${volumedriver}
-  configui:
-    #external: true
-    driver: ${volumedriver}
-  configadminserver:
-    #external: true
-    driver: ${volumedriver}
-  data: #according to the eng team this is not even needed (but leaving it in for consistency)
-    #external: true
-    driver: ${volumedriver}
-#  data-registry:
-#    #external: true
-#    driver: ${volumedriver}
-#  data-database:
-#    #external: true
-#    driver: ${volumedriver}
-  data-job_logs:
-    #external: true
-    driver: ${volumedriver}
-  data-ca_download:
-    #external: true
-    driver: ${volumedriver}
-  data-config:
-    #external: true
+  harbor/ui:
+    external: true
     driver: ${volumedriver}
 services:
   harbor-setupwrapper:
     image: mreferre/harbor-setupwrapper:1.1.1-1
     container_name: harbor-setupwrapper
     environment:
-      - HARBORHOSTNAME=${harborhostname}.${traefikdomain}
-      - HARBOR_ADMIN_PASSWORD=${harbor_admin_password}
-      - DB_PASSWORD=${db_password}
-      - AUTH_MODE=${auth_mode}
-      - LDAP_URL=${ldap_url}
-      - LDAP_BASEDN=${ldap_basedn}
+      - PRIVATE_KEY=${private_key}
+      - PUBLIC_KEY=${public_key}
+      - CONFIG=${config}
+      - SECRETKEY=${secretkey}
     volumes:
-      - data:/data
-      - etcui:/etc/ui
-      - etcjobservice:/etc/jobservice
-      - etcregistry:/etc/registry
-      - etcnginx:/etc/nginx
-      - configdb:/configdb
-      - configui:/configui
-      - configjobservice:/configjobservice
-      - configadminserver:/configadminserver
+      - harbor/ui:/etc/ui
+      - harbor/jobservice:/etc/jobservice
+      - harbor/registry:/etc/registry
+      - harbor/adminserver:/etc/adminserver
     command: ["/harbor/harbor-setupwrapper.sh"]
     network_mode: "none"
     labels:
  #     io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
       io.rancher.container.start_once: 'true'
- # log:
- #   image: vmware/harbor-log:v1.1.1
- #   container_name: harbor-log
- #   restart: always
- #   volumes:
- #     - /var/log/harbor/:/var/log/docker/:z
- #   ports:
- #     - 1514:514
- #   labels:
- #     io.rancher.scheduler.global: 'true'
- #     io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
- #     io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
- #     io.rancher.container.hostname_override: container_name
   registry:
     image: vmware/registry:2.6.2-photon
     container_name: registry
     restart: always
     volumes:
-      - data:/data
-      - data-ca_download:/etc/ui/ca/
-      - data-config:/etc/adminserver/config/
-      - etcui:/etc/ui
-      - etcjobservice:/etc/jobservice
-      - etcregistry:/etc/registry
-      - configdb:/configdb
-      - configui:/configui
-      - configjobservice:/configjobservice
-      - configadminserver:/configadminserver
+      - harbor/registry:/etc/registry
     environment:
       - GODEBUG=netdns=cgo
     command:
       ["serve", "/etc/registry/config.yml"]
     depends_on:
-      #- log
       - harbor-setupwrapper
     logging:
       driver: "json-file"
@@ -111,69 +51,46 @@ services:
     labels:
       #io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
-#  mysql:
-#    image: vmware/harbor-db:v1.1.1
-#    container_name: harbor-db
-#    restart: always
-#    volumes:
-#      - data-database:/var/lib/mysql
-#      - data:/data:z
-#      - data-job_logs:/var/log/jobs
-#      - data-ca_download:/etc/ui/ca/
-#      - data-config:/etc/adminserver/config/
-#      - etcui:/etc/ui
-#      - etcjobservice:/etc/jobservice
-#      - etcregistry:/etc/registry
-#      - etcnginx:/etc/nginx
-#      - configdb:/configdb
-#      - configui:/configui
-#      - configjobservice:/configjobservice
-#      - configadminserver:/configadminserver
-#    depends_on:
-#      - log
-#      - harbor-setupwrapper
-#    logging:
-#      driver: "syslog"
-#      options:
-#        syslog-address: "tcp://127.0.0.1:1514"
-#        tag: "mysql"
-#    entrypoint:
-#      - /bin/sh
-#      - -c
-#    command:
-#      - /configdb/entrypointdb.sh
-#    labels:
-#      io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
-#      io.rancher.container.hostname_override: container_name
   adminserver:
     image: vmware/harbor-adminserver:v1.2.2
     container_name: harbor-adminserver
     restart: always
+    environment:
+      - LOG_LEVEL=debug
+      - EXT_ENDPOINT=${harborhostname}
+      - AUTH_MODE=${auth_mode}
+      - SELF_REGISTRATION=on
+      - LDAP_URL=${ldap_url}
+      - LDAP_BASE_DN=${ldap_basedn}
+      - LDAP_SEARCH_DN=${ldap_searchdn}
+      - LDAP_SEARCH_PWD=${ldap_search_pwd}
+      - LDAP_UID=uid
+      - LDAP_SCOPE=3
+      - LDAP_TIMEOUT=5
+      - DATABASE_TYPE=mysql
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USR=root
+      - MYSQL_PWD=${db_password}
+      - MYSQL_DATABASE=registry
+      - REGISTRY_URL=http://registry:5000
+      - TOKEN_SERVICE_URL=http://ui/service/token
+      - HARBOR_ADMIN_PASSWORD=${harbor_admin_password}
+      - VERIFY_REMOTE_CERT=on
+      - MAX_JOB_WORKERS=5
+      - UI_SECRET=HvfmjXymGJsmtLaD
+      - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
+      - TOKEN_EXPIRATION=30
+      - CFG_EXPIRATION=5
+      - GODEBUG=netdns=cgo
     volumes:
-#      - /data/secretkey:/etc/adminserver/key
-      - data-database:/var/lib/mysql
-      - data:/data/:z
-      - data-job_logs:/var/log/jobs
-      - data-ca_download:/etc/ui/ca/
-      - data-config:/etc/adminserver/config/
-      - etcui:/etc/ui
-      - etcjobservice:/etc/jobservice
-      - etcregistry:/etc/registry
-      - configdb:/configdb
-      - configui:/configui
-      - configjobservice:/configjobservice
-      - configadminserver:/configadminserver
+      - harbor/adminserver:/etc/adminserver
     depends_on:
       - harbor-setupwrapper
     logging:
       driver: "json-file"
       options:
         max-size: "200m"
-    entrypoint:
-      - /bin/sh
-      - -c
-    command:
-      - /configadminserver/entrypointadminserver.sh
     labels:
    #   io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
@@ -181,18 +98,14 @@ services:
     image: vmware/harbor-ui:v1.2.2
     container_name: harbor-ui
     restart: always
+    environment:
+      - LOG_LEVEL=debug
+      - CONFIG_PATH=/etc/ui/app.conf
+      - UI_SECRET=HvfmjXymGJsmtLaD
+      - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
+      - GODEBUG=netdns=cgo
     volumes:
-      - data:/data/:z
-      - data-job_logs:/var/log/jobs
-      - data-ca_download:/etc/ui/ca/
-      - data-config:/etc/adminserver/config/
-      - etcui:/etc/ui
-      - etcjobservice:/etc/jobservice
-      - etcregistry:/etc/registry
-      - configdb:/configdb
-      - configui:/configui
-      - configjobservice:/configjobservice
-      - configadminserver:/configadminserver
+      - harbor/ui:/etc/ui
     depends_on:
       - harbor-setupwrapper
       - adminserver
@@ -201,11 +114,6 @@ services:
       driver: "json-file"
       options:
         max-size: "200m"
-    entrypoint:
-      - /bin/sh
-      - -c
-    command:
-      - /configui/entrypointui.sh
     labels:
      # io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
@@ -213,19 +121,14 @@ services:
     image: vmware/harbor-jobservice:v1.2.2
     container_name: harbor-jobservice
     restart: always
+    environment:
+      - LOG_LEVEL=debug
+      - CONFIG_PATH=/etc/jobservice/app.conf
+      - UI_SECRET=HvfmjXymGJsmtLaD
+      - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
+      - GODEBUG=netdns=cgo
     volumes:
-#      - /data/secretkey:/etc/jobservice/key:z
-      - data:/data/:z
-      - data-job_logs:/var/log/jobs
-      - data-ca_download:/etc/ui/ca/
-      - data-config:/etc/adminserver/config/
-      - etcui:/etc/ui
-      - etcjobservice:/etc/jobservice
-      - etcregistry:/etc/registry
-      - configdb:/configdb
-      - configui:/configui
-      - configjobservice:/configjobservice
-      - configadminserver:/configadminserver
+      - harbor/jobservice:/etc/jobservice
     depends_on:
       - harbor-setupwrapper
       - ui
@@ -234,56 +137,9 @@ services:
       driver: "json-file"
       options:
         max-size: "200m"
-    entrypoint:
-      - /bin/sh
-      - -c
-    command:
-      - /configjobservice/entrypointjobservice.sh
     labels:
      #io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
      io.rancher.container.hostname_override: container_name
-  #proxy:
-  #  image: vmware/nginx:1.11.5-patched
-  #  container_name: nginx
-  #  restart: always
-  #  volumes:
-  #    - data-database:/var/lib/mysql
-  #    - data:/data/:z
-  #    - data-job_logs:/var/log/jobs
-  #    - data-ca_download:/etc/ui/ca/
-  #    - data-config:/etc/adminserver/config/
-  #    - etcui:/etc/ui
-  #    - etcjobservice:/etc/jobservice
-  #    - etcregistry:/etc/registry
-  #    - etcnginx:/etc/nginx
-  #    - configdb:/configdb
-  #    - configui:/configui
-  #    - configjobservice:/configjobservice
-  #    - configadminserver:/configadminserver
-  #  depends_on:
-  #    - mysql
-  #    - registry
-  #    - ui
-  #    - log
-  #    - harbor-setupwrapper
-  #  external_links: #these entries seem to be required for the proxy service to start correctly
-  #    - registry
-  #    - ui
-  #    - mysql
-  #    - jobservice
-  #    - adminserver
-  #  logging:
-  #    driver: "json-file"
-  #    options:
-  #      max-size: "200m"
-  #  logging:
-  #    driver: "syslog"
-  #    options:
-  #      syslog-address: "tcp://127.0.0.1:1514"
-  #      tag: "proxy"
-  #  labels:
-  #    io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
-  #    io.rancher.container.hostname_override: container_name
   harbor-lb:
     image: rancher/lb-service-haproxy
     ports:
