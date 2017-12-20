@@ -93,12 +93,22 @@ version: '2'
       description: "Harbor private key for general token:"
       label: "Private Key:"
       required: true
-      type: "certificate"
+      type: "multiline"
+    - variable: "root.crt"
+      description: "Harbor public key for verify token:"
+      label: "Public Key:"
+      required: true
+      type: "multiline"
     - variable: "config.yml"
       description: "Harbor registry config.yml:"
       label: "Config:"
       required: true
       type: "multiline"
+    - variable: "secrekey"
+      description: "secrekey for ui and jobservice to access adminserver"
+      label: "Secrekey"
+      required: true
+      type: "string"
 services:
   registry:
     scale: 1
