@@ -89,6 +89,16 @@ version: '2'
       options:
         - db_auth
         - ldap_auth
+    - variable: "private_key.pem"
+      description: "Harbor private key for general token:"
+      label: "Private Key:"
+      required: true
+      type: "certificate"
+    - variable: "config.yml"
+      description: "Harbor registry config.yml:"
+      label: "Config:"
+      required: true
+      type: "multiline"
 services:
   registry:
     scale: 1
