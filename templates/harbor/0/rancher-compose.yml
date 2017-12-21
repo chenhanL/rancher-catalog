@@ -114,12 +114,9 @@ services:
     lb_config:
       port_rules:
       - source_port: 8080
-        target_port: 5000
-        path: /v2
-        service: registry
-      - source_port: 8080
         target_port: 80
         path: /
+        hostname: ${harborhostname}
         service: ui
     health_check:
       port: 42
