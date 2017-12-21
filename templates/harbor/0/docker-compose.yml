@@ -57,7 +57,7 @@ services:
     restart: always
     environment:
       - LOG_LEVEL=debug
-      - EXT_ENDPOINT=${harborhostname}
+      - EXT_ENDPOINT=https://${harborhostname}
       - AUTH_MODE=${auth_mode}
       - SELF_REGISTRATION=on
       - LDAP_URL=${ldap_url}
@@ -134,8 +134,8 @@ services:
     #depends_on:
     links:
       - harbor-setupwrapper
-      - ui
       - adminserver
+      - ui
     logging:
       driver: "json-file"
       options:
