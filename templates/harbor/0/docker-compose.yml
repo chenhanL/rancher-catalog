@@ -84,7 +84,8 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - harbor_adminserver:/etc/adminserver
-    depends_on:
+   # depends_on:
+    links:
       - harbor-setupwrapper
     logging:
       driver: "json-file"
@@ -105,7 +106,8 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - harbor_ui:/etc/ui
-    depends_on:
+    #depends_on:
+    links:
       - harbor-setupwrapper
       - adminserver
       - registry
@@ -128,7 +130,8 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - harbor_jobservice:/etc/jobservice
-    depends_on:
+    #depends_on:
+    links:
       - harbor-setupwrapper
       - ui
       - adminserver
