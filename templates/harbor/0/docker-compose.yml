@@ -1,6 +1,6 @@
 version: '2'
 volumes: #most volumes mappings require optimization (now all volumes map all containers)
-  harbor_adminservice:
+  harbor_adminserver:
     #external: true
     driver: ${volumedriver}
   harbor_jobservice:
