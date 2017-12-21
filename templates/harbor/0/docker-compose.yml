@@ -1,15 +1,15 @@
 version: '2'
 volumes: #most volumes mappings require optimization (now all volumes map all containers)
-  harbor/adminservice:
+  harbor_adminservice:
     external: true
     driver: ${volumedriver}
-  harbor/jobservice:
+  harbor_jobservice:
     external: true
     driver: ${volumedriver}
-  harbor/registry:
+  harbor_registry:
     external: true
     driver: ${volumedriver}
-  harbor/ui:
+  harbor_ui:
     external: true
     driver: ${volumedriver}
 services:
@@ -22,10 +22,10 @@ services:
       - CONFIG=${config}
       - SECRETKEY=${secretkey}
     volumes:
-      - harbor/ui:/etc/ui
-      - harbor/jobservice:/etc/jobservice
-      - harbor/registry:/etc/registry
-      - harbor/adminserver:/etc/adminserver
+      - harbor_ui:/etc/ui
+      - harbor_jobservice:/etc/jobservice
+      - harbor_registry:/etc/registry
+      - harbor_adminserver:/etc/adminserver
     command: ["/harbor/harbor-setupwrapper.sh"]
     network_mode: "none"
     labels:
@@ -37,7 +37,7 @@ services:
     container_name: registry
     restart: always
     volumes:
-      - harbor/registry:/etc/registry
+      - harbor_registry:/etc/registry
     environment:
       - GODEBUG=netdns=cgo
     command:
@@ -84,7 +84,7 @@ services:
       - CFG_EXPIRATION=5
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor/adminserver:/etc/adminserver
+      - harbor_adminserver:/etc/adminserver
     depends_on:
       - harbor-setupwrapper
     logging:
@@ -105,7 +105,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor/ui:/etc/ui
+      - harbor_ui:/etc/ui
     depends_on:
       - harbor-setupwrapper
       - adminserver
@@ -128,7 +128,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor/jobservice:/etc/jobservice
+      - harbor_jobservice:/etc/jobservice
     depends_on:
       - harbor-setupwrapper
       - ui
