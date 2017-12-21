@@ -104,11 +104,6 @@ version: '2'
       label: "Config:"
       required: true
       type: "multiline"
-    - variable: "secretkey"
-      description: "secretkey for ui and jobservice to access adminserver"
-      label: "Secretkey"
-      required: true
-      type: "string"
 services:
   registry:
     scale: 1

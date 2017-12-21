@@ -20,7 +20,6 @@ services:
       - PRIVATE_KEY=${private_key}
       - PUBLIC_KEY=${public_key}
       - CONFIG=${config}
-      - SECRETKEY=${secretkey}
     volumes:
       - harbor_ui:/etc/ui
       - harbor_jobservice:/etc/jobservice
