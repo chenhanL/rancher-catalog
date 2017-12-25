@@ -146,3 +146,9 @@ services:
     scale: 1
     external_ips:
     - ${db_address}
+    health_check:
+      port: 3306
+      response_timeout: 2000
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      interval: 2000
