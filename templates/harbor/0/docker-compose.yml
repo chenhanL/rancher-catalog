@@ -37,6 +37,7 @@ services:
     restart: always
     volumes:
       - harbor_registry:/etc/registry
+      - ${data_registry}:/storage
     environment:
       - GODEBUG=netdns=cgo
     command:
@@ -151,4 +152,6 @@ services:
       io.rancher.scheduler.global: 'true'
       #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}
       io.rancher.container.hostname_override: container_name
+  mysql:
+    image: rancher/external-service
 

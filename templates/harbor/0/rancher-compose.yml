@@ -20,6 +20,13 @@ version: '2'
       default: Vmware123!
       required: true
       type: "string"
+    - variable: "db_address"
+      label: "Harbor database ip address:"
+      description: |
+        Harbor database ip address
+      default: 1.1.1.1
+      required: true
+      type: "string"
     - variable: "db_password"
       label: "Harbor database password:"
       description: |
@@ -104,6 +111,11 @@ version: '2'
       label: "Config:"
       required: true
       type: "multiline"
+    - variable: "data_registry"
+      description: "Harbor registry storage path:(only for filesystem storage in config.yml)"
+      label: "StoragePath:"
+      required: true
+      type: "string"
 services:
   registry:
     scale: 1
@@ -130,3 +142,7 @@ services:
     scale: 1
   harbor-setupwrapper:
     scale: 1
+  mysql:
+    scale: 1
+    external_ips:
+    - ${db_address}
