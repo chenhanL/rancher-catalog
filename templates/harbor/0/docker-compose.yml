@@ -86,6 +86,7 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - harbor_adminserver:/etc/adminserver
+      - ${data_registry}:/data
    # depends_on:
     links:
       - harbor-setupwrapper
