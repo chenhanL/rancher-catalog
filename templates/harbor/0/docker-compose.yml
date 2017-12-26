@@ -161,7 +161,7 @@ services:
  #     #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}
  #     io.rancher.container.hostname_override: container_name
   nginx:
-    image: vmware/nginx:1.11.5-patched
+    image: vmware/nginx-photon:1.11.13
     ports:
       - "80:80"
       - "443:443"
