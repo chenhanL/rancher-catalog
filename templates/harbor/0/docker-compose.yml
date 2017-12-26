@@ -163,12 +163,14 @@ services:
   nginx:
     image: vmware/nginx:1.11.5-patched
     ports:
-      - 80
-      - 443
+      - "80:80"
+      - "443:443"
     volumes:
       - nginx:/etc/nginx
     links:
       - harbor-setupwrapper
+      - ui
+      - registry
     logging:
       driver: "json-file"
       options:
