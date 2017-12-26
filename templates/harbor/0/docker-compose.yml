@@ -1,15 +1,18 @@
 version: '2'
 volumes: #most volumes mappings require optimization (now all volumes map all containers)
-  harbor_adminserver:
+  adminserver:
     #external: true
     driver: ${volumedriver}
-  harbor_jobservice:
+  jobservice:
     #external: true
     driver: ${volumedriver}
-  harbor_registry:
+  registry:
     #external: true
     driver: ${volumedriver}
-  harbor_ui:
+  ui:
+    #external: true
+    driver: ${volumedriver}
+  nginx:
     #external: true
     driver: ${volumedriver}
 services:
@@ -20,11 +23,15 @@ services:
       - PRIVATE_KEY=${private_key}
       - PUBLIC_KEY=${public_key}
       - CONFIG=${config}
+      - CERTIFICATE_KEY=${certificate_key}
+      - CERTIFICATE_CRT=${certificate_crt}
+      - NGINX_CONFIG=${nginx_config}
     volumes:
-      - harbor_ui:/etc/ui
-      - harbor_jobservice:/etc/jobservice
-      - harbor_registry:/etc/registry
-      - harbor_adminserver:/etc/adminserver
+      - ui:/etc/ui
+      - jobservice:/etc/jobservice
+      - registry:/etc/registry
+      - adminserver:/etc/adminserver
+      - nginx:/etc/nginx
     command: ["/harbor/harbor-setupwrapper.sh"]
     network_mode: "none"
     labels:
@@ -36,7 +43,7 @@ services:
     container_name: registry
     restart: always
     volumes:
-      - harbor_registry:/etc/registry
+      - registry:/etc/registry
       - ${data_registry}:/storage
     environment:
       - GODEBUG=netdns=cgo
@@ -85,7 +92,7 @@ services:
       - CFG_EXPIRATION=5
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor_adminserver:/etc/adminserver
+      - adminserver:/etc/adminserver
       - ${data_registry}:/data
    # depends_on:
     links:
@@ -108,7 +115,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor_ui:/etc/ui
+      - ui:/etc/ui
     #depends_on:
     links:
       - harbor-setupwrapper
@@ -132,7 +139,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - harbor_jobservice:/etc/jobservice
+      - jobservice:/etc/jobservice
     #depends_on:
     links:
       - harbor-setupwrapper
@@ -145,10 +152,27 @@ services:
     labels:
      #io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
      io.rancher.container.hostname_override: container_name
-  harbor-lb:
-    image: rancher/lb-service-haproxy
+ # harbor-lb:
+ #   image: rancher/lb-service-haproxy
+ #   ports:
+ #     - 8080
+ #   labels:
+ #     io.rancher.scheduler.global: 'true'
+ #     #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}
+ #     io.rancher.container.hostname_override: container_name
+  nginx:
+    image: vmware/nginx:1.11.5-patched
     ports:
-      - 8080
+      - 80
+      - 443
+    volumes:
+      - nginx:/etc/nginx
+    links:
+      - harbor-setupwrapper
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
     labels:
       io.rancher.scheduler.global: 'true'
       #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}

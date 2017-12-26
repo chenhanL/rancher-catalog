@@ -106,9 +106,24 @@ version: '2'
       label: "Public Key:"
       required: true
       type: "multiline"
+    - variable: "certificate_key"
+      description: "Harbor certificate key for TSL connection:"
+      label: "Certificate Key:"
+      required: true
+      type: "multiline"
+    - variable: "certificate_crt"
+      description: "Harbor certificate.crt for TSL connection:"
+      label: "Certificate:"
+      required: true
+      type: "multiline"
     - variable: "config"
       description: "Harbor registry config.yml:"
-      label: "Config:"
+      label: "Registry Config:"
+      required: true
+      type: "multiline"
+    - variable: "nginx_config"
+      description: "Harbor nginx conf:"
+      label: "Nginx Config:"
       required: true
       type: "multiline"
     - variable: "data_registry"
@@ -121,27 +136,35 @@ services:
     scale: 1
   adminserver:
     scale: 1
-  harbor-lb:
-    scale: 1
-    lb_config:
-      port_rules:
-      - source_port: 8080
-        target_port: 80
-        path: /
-        hostname: ${harborhostname}
-        service: ui
-    health_check:
-      port: 42
-      interval: 2000
-      unhealthy_threshold: 3
-      healthy_threshold: 2
-      response_timeout: 2000
+  #harbor-lb:
+  #  scale: 1
+  #  lb_config:
+  #    port_rules:
+  #    - source_port: 8080
+  #      target_port: 80
+  #      path: /
+  #      hostname: ${harborhostname}
+  #      service: ui
+  #  health_check:
+  #    port: 42
+  #    interval: 2000
+  #    unhealthy_threshold: 3
+  #    healthy_threshold: 2
+  #    response_timeout: 2000
   jobservice:
     scale: 1
   ui:
     scale: 1
   harbor-setupwrapper:
     scale: 1
+  nginx:
+    scale: 1
+    health_check:
+      port: 443
+      internal: 2000
+      unhealthy_threshold: 3
+      healthy_threshold: 2
+      response_timeout: 2000
   mysql:
     scale: 1
     external_ips:
