@@ -12,7 +12,6 @@ services:
       - CERTIFICATE_CRT=${certificate_crt}
     volumes:
       - vault:/etc/vault
-    command: ["/vault-setupwrapper.sh"]
     network_mode: "none"
     labels:
       io.rancher.container.hostname_override: container_name
