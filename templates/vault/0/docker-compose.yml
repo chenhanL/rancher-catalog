@@ -42,7 +42,7 @@ services:
       ["master"]
     links:
       - setupwrapper
-      - vault
+      - vault:vault.sensetime.com
     logging:
       driver: "json-file"
       options:
