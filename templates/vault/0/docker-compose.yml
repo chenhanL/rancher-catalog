@@ -41,9 +41,9 @@ services:
       ["master"]
     links:
       - setupwrapper
-      - vault
-    extra_hosts:
-      - "vault.sensetime.com:127.0.0.1"
+      - vault:vault.sensetime.com
+    #extra_hosts:
+    #  - "vault.sensetime.com:127.0.0.1"
     logging:
       driver: "json-file"
       options:
