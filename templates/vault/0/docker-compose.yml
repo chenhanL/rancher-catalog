@@ -23,8 +23,6 @@ services:
     restart: always
     volumes:
       - vault:/etc/vault
-    environment:
-      - GODEBUG=netdns=cgo
     command:
       ["vault", "server", "-config=/etc/vault/config.hcl"]
     links:
@@ -41,8 +39,6 @@ services:
     container_name: vault-auto-unsealer
     volumes_from:
       - vault
-    environment:
-      - GODEBUG=netdns=cgo
     command:
       ["master"]
     links:
@@ -60,6 +56,8 @@ services:
     container_name: vault-ui
     restart: always
     environment:
+      - VAULT_URL_DEFAULT=https://vault.sensetime.com:8200
+      - VAULT_AUTH_DEFAULT=LDAP
     links:
       - vault:vault.sensetime.com
     logging:
