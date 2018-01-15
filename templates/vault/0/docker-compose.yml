@@ -19,6 +19,7 @@ services:
   vault:
     image: registry.sensetime.com/sre/vault:0.9.1
     container_name: vault
+    network_mode: bridge
     restart: always
     volumes:
       - vault:/etc/vault
@@ -34,8 +35,9 @@ services:
   vault-auto-unsealer:
     image: registry.sensetime.com/sre/vault-auto-unsealer:0.9.1
     container_name: vault-auto-unsealer
-    volumes:
-      - vault:/etc/vault
+    network_mode: container:vault
+    volumes_from:
+      - vault
     command:
       ["master"]
     links:
