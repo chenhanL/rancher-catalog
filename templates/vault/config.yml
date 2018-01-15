@@ -1,0 +1,9 @@
+---
+name: Vault
+description: >
+  Vault Stack for SenseTime Container Infrastructure.
+version: 0.9.1
+category: Vault
+maintainer: Lining <lining@sensetime.com>
+license: Apache2
+projectURL: https://github.com/chenhanL/rancher-catalog

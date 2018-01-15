@@ -1,0 +1,70 @@
+version: '2'
+volumes: #most volumes mappings require optimization (now all volumes map all containers)
+  vault:
+    driver: ${volumedriver}
+services:
+  setupwrapper:
+    image: registry.sensetime.com/sre/vault-setupwrapper:v1
+    container_name: setupwrapper
+    environment:
+      - CONFIG=${config}
+      - CERTIFICATE_KEY=${certificate_key}
+      - CERTIFICATE_CRT=${certificate_crt}
+    volumes:
+      - vault:/etc/vault
+    command: ["/vault-setupwrapper.sh"]
+    network_mode: "none"
+    labels:
+      io.rancher.container.hostname_override: container_name
+      io.rancher.container.start_once: 'true'
+  vault:
+    image: registry.sensetime.com/sre/vault:0.9.1
+    container_name: vault
+    restart: always
+    volumes:
+      - vault:/etc/vault
+    environment:
+      - GODEBUG=netdns=cgo
+    command:
+      ["vault", "server", "-config=/etc/vault/config.hcl"]
+    links:
+      - setupwrapper
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+    labels:
+      io.rancher.container.hostname_override: container_name
+      io.rancher.sidekicks: vault-auto-unsealer
+  vault-auto-unsealer:
+    image: registry.sensetime.com/sre/vault-auto-unsealer:0.9.1
+    container_name: vault-auto-unsealer
+    volumes_from:
+      - vault
+    environment:
+      - GODEBUG=netdns=cgo
+    command:
+      ["master"]
+    links:
+      - setupwrapper
+      - vault
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+    labels:
+      io.rancher.container.hostname_override: container_name
+      io.rancher.container.start_once: 'true'
+  vault-ui:
+    image: registry.sensetime.com/sre/vault-ui:v1
+    container_name: vault-ui
+    restart: always
+    environment:
+    links:
+      - vault:vault.sensetime.com
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+    labels:
+      io.rancher.container.hostname_override: container_name

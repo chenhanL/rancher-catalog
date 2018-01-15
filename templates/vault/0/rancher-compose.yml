@@ -1,0 +1,39 @@
+version: '2'
+.catalog:
+  name: Vault
+  version: 0.9.1
+  description: |
+    Enterprise Secret Manager [by Hashicorp]
+  minimum_rancher_version: 0.9.1
+  uuid: vault-1
+  questions:
+    - variable: "volumedriver"
+      description: "Volume Driver being used. Set rancher-nfs if you run in schedulable mode"
+      label: "Volume Driver:"
+      required: true
+      default: rancher-nfs
+      type: "enum"
+      options:
+        - rancher-nfs
+    - variable: "certificate_key"
+      description: "Vault certificate key for TSL connection:"
+      label: "Certificate Key:"
+      required: true
+      type: "multiline"
+    - variable: "certificate_crt"
+      description: "Vault certificate crt for TSL connection:"
+      label: "Certificate:"
+      required: true
+      type: "multiline"
+    - variable: "config"
+      description: "Vault config.hcl:"
+      label: "Vault Config:"
+      required: true
+      type: "multiline"
+services:
+  vault:
+    scale: 1
+  vault-ui:
+    scale: 1
+  setupwrapper:
+    scale: 1
