@@ -19,7 +19,6 @@ services:
   vault:
     image: registry.sensetime.com/sre/vault:0.9.1
     container_name: vault
-    network_mode: bridge
     restart: always
     volumes:
       - vault:/etc/vault
