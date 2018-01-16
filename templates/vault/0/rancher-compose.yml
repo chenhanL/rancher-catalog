@@ -37,3 +37,7 @@ services:
     scale: 1
   setupwrapper:
     scale: 1
+  vault-s3:
+    external_ips:
+    - 10.100.53.116
+    start_on_create: true

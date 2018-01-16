@@ -24,6 +24,7 @@ services:
       - vault:/etc/vault
     links:
       - setupwrapper
+      - vault-s3:haha.10.100.53.116
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
     logging:
@@ -68,3 +69,5 @@ services:
         max-size: "200m"
     labels:
       io.rancher.container.hostname_override: container_name
+  vault-s3:
+    image: rancher/external-service
