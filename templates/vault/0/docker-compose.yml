@@ -24,9 +24,9 @@ services:
       - vault:/etc/vault
     links:
       - setupwrapper
-      - vault-s3:haha.10.100.53.116
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
+      - "haha.10.100.53.116:10.100.53.116"
     logging:
       driver: "json-file"
       options:
