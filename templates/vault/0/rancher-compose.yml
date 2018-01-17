@@ -1,10 +1,10 @@
 version: '2'
 .catalog:
   name: Vault
-  version: 0.9.1
+  version: 0.9.1-2e51b15
   description: |
     Enterprise Secret Manager [by Hashicorp]
-  minimum_rancher_version: 0.9.1
+  minimum_rancher_version: 0.9.1-2e51b15
   uuid: vault-1
   questions:
     - variable: "volumedriver"
