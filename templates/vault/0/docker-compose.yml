@@ -17,16 +17,16 @@ services:
       io.rancher.container.hostname_override: container_name
       io.rancher.container.start_once: 'true'
   vault:
-    image: registry.sensetime.com/sre/vault:0.9.1
+    image: registry.sensetime.com/sre/vault:2e51b15
     container_name: vault
     restart: always
     volumes:
       - vault:/etc/vault
     links:
       - setupwrapper
+      - vault-s3: haha.10.100.53.116
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
-      - "haha.10.100.53.116:10.100.53.116"
     logging:
       driver: "json-file"
       options:
@@ -35,7 +35,7 @@ services:
       io.rancher.container.hostname_override: container_name
       io.rancher.sidekicks: vault-auto-unsealer
   vault-auto-unsealer:
-    image: registry.sensetime.com/sre/vault-auto-unsealer:0.9.1
+    image: registry.sensetime.com/sre/vault-auto-unsealer:2e51b15
     container_name: vault-auto-unsealer
     network_mode: container:vault
     volumes_from:
