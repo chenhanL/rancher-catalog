@@ -51,18 +51,18 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
       io.rancher.container.start_once: 'true'
-  vault-ui:
-    image: registry.sensetime.com/sre/vault-ui:v1
-    container_name: vault-ui
-    restart: always
-    environment:
-      - VAULT_URL_DEFAULT=https://vault.sensetime.com:8200
-      - VAULT_AUTH_DEFAULT=LDAP
-    links:
-      - vault:vault.sensetime.com
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200m"
-    labels:
-      io.rancher.container.hostname_override: container_name
+#  vault-ui:
+#    image: registry.sensetime.com/sre/vault-ui:v1
+#    container_name: vault-ui
+#    restart: always
+#    environment:
+#      - VAULT_URL_DEFAULT=https://vault.sensetime.com:8200
+#      - VAULT_AUTH_DEFAULT=LDAP
+#    links:
+#      - vault:vault.sensetime.com
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "200m"
+#    labels:
+#      io.rancher.container.hostname_override: container_name

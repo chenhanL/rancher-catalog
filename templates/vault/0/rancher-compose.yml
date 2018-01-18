@@ -16,12 +16,12 @@ version: '2'
       options:
         - rancher-nfs
     - variable: "certificate_key"
-      description: "Vault certificate key for TSL connection:"
+      description: "Vault certificate key for etcd TSL connection:"
       label: "Certificate Key:"
       required: true
       type: "multiline"
     - variable: "certificate_crt"
-      description: "Vault certificate crt for TSL connection:"
+      description: "Vault certificate crt for etcd TSL connection:"
       label: "Certificate:"
       required: true
       type: "multiline"
@@ -33,7 +33,7 @@ version: '2'
 services:
   vault:
     scale: 1
-  vault-ui:
-    scale: 1
+  #vault-ui:
+  #  scale: 1
   setupwrapper:
     scale: 1
