@@ -33,7 +33,7 @@ version: '2'
 services:
   vault:
     scale: 1
-  #vault-ui:
-  #  scale: 1
+  vault-ui:
+    scale: 1
   setupwrapper:
     scale: 1
