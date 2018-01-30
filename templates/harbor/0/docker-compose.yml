@@ -1,43 +1,18 @@
 version: '2'
-volumes: #most volumes mappings require optimization (now all volumes map all containers)
+volumes:
   adminserver:
-    #external: true
+    external: true
     driver: ${volumedriver}
   jobservice:
-    #external: true
+    external: true
     driver: ${volumedriver}
   registry:
-    #external: true
+    external: true
     driver: ${volumedriver}
   ui:
-    #external: true
-    driver: ${volumedriver}
-  nginx:
-    #external: true
+    external: true
     driver: ${volumedriver}
 services:
-  harbor-setupwrapper:
-    image: chuckey/harbor-setupwrapper:v1.2.2
-    container_name: harbor-setupwrapper
-    environment:
-      - PRIVATE_KEY=${private_key}
-      - PUBLIC_KEY=${public_key}
-      - CONFIG=${config}
-      - CERTIFICATE_KEY=${certificate_key}
-      - CERTIFICATE_CRT=${certificate_crt}
-      - NGINX_CONFIG=${nginx_config}
-    volumes:
-      - ui:/etc/ui
-      - jobservice:/etc/jobservice
-      - registry:/etc/registry
-      - adminserver:/etc/adminserver
-      - nginx:/etc/nginx
-    command: ["/harbor/harbor-setupwrapper.sh"]
-    network_mode: "none"
-    labels:
- #     io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
-      io.rancher.container.hostname_override: container_name
-      io.rancher.container.start_once: 'true'
   registry:
     image: vmware/registry:2.6.2-photon
     container_name: registry
@@ -49,9 +24,6 @@ services:
       - GODEBUG=netdns=cgo
     command:
       ["serve", "/etc/registry/config.yml"]
-    #depends_on:
-    links:
-      - harbor-setupwrapper
     logging:
       driver: "json-file"
       options:
@@ -94,15 +66,11 @@ services:
     volumes:
       - adminserver:/etc/adminserver
       - ${data_registry}:/data
-   # depends_on:
-    links:
-      - harbor-setupwrapper
     logging:
       driver: "json-file"
       options:
         max-size: "200m"
     labels:
-   #   io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
   ui:
     image: vmware/harbor-ui:v1.2.2
@@ -116,9 +84,7 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - ui:/etc/ui
-    #depends_on:
     links:
-      - harbor-setupwrapper
       - adminserver
       - registry
     logging:
@@ -126,7 +92,6 @@ services:
       options:
         max-size: "200m"
     labels:
-     # io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
       io.rancher.container.hostname_override: container_name
   jobservice:
     image: vmware/harbor-jobservice:v1.2.2
@@ -140,9 +105,7 @@ services:
       - GODEBUG=netdns=cgo
     volumes:
       - jobservice:/etc/jobservice
-    #depends_on:
     links:
-      - harbor-setupwrapper
       - adminserver
       - ui
     logging:
@@ -150,35 +113,7 @@ services:
       options:
         max-size: "200m"
     labels:
-     #io.rancher.scheduler.affinity:host_label: ${harborhostlabel}
      io.rancher.container.hostname_override: container_name
- # harbor-lb:
- #   image: rancher/lb-service-haproxy
- #   ports:
- #     - 8080
- #   labels:
- #     io.rancher.scheduler.global: 'true'
- #     #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}
- #     io.rancher.container.hostname_override: container_name
-  nginx:
-    image: vmware/nginx-photon:1.11.13
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - nginx:/etc/nginx
-    links:
-      - harbor-setupwrapper
-      - ui
-      - registry
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200m"
-    labels:
-      io.rancher.scheduler.global: 'true'
-      #io.rancher.scheduler.affinity:host_label: ${harborlbhostlabel}
-      io.rancher.container.hostname_override: container_name
   mysql:
     image: rancher/external-service
 
