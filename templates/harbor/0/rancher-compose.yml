@@ -80,16 +80,6 @@ version: '2'
       options:
         - db_auth
         - ldap_auth
-    - variable: "private_key"
-      description: "Harbor private key for general token:"
-      label: "Private Key:"
-      required: true
-      type: "multiline"
-    - variable: "public_key"
-      description: "Harbor public key for verify token:"
-      label: "Public Key:"
-      required: true
-      type: "multiline"
     - variable: "data_registry"
       description: "Harbor registry storage path:(only for filesystem storage in config.yml)"
       label: "StoragePath:"

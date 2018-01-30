@@ -3,15 +3,23 @@ volumes:
   adminserver:
     external: true
     driver: ${volumedriver}
+    driver_opts:
+      exportBase: /nfs/harbor
   jobservice:
     external: true
     driver: ${volumedriver}
+    driver_opts:
+      exportBase: /nfs/harbor
   registry:
     external: true
     driver: ${volumedriver}
+    driver_opts:
+      exportBase: /nfs/harbor
   ui:
     external: true
     driver: ${volumedriver}
+    driver_opts:
+      exportBase: /nfs/harbor
 services:
   registry:
     image: vmware/registry:2.6.2-photon
