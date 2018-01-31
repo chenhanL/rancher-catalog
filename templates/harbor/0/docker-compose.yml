@@ -1,15 +1,15 @@
 version: '2'
 volumes:
-  adminserver:
+  harbor_adminserver:
     external: true
     driver: ${volumedriver}
-  jobservice:
+  harbor_jobservice:
     external: true
     driver: ${volumedriver}
-  registry:
+  harbor_registry:
     external: true
     driver: ${volumedriver}
-  ui:
+  harbor_ui:
     external: true
     driver: ${volumedriver}
 services:
@@ -18,10 +18,10 @@ services:
     container_name: setupswrapper
     restart: always
     volumes:
-      - adminserver:/etc/adminserver
-      - jobservice:/etc/jobservice
-      - registry:/etc/registry
-      - ui:/etc/ui
+      -harbor_adminserver:/etc/adminserver
+      -harbor_jobservice:/etc/jobservice
+      -harbor_registry:/etc/registry
+      -harbor_ui:/etc/ui
     environment:
       - REGISTRY_CONFIG=${registry_config}
     command: ["/harbor/harbor-setupswrapper.sh"]
@@ -38,7 +38,7 @@ services:
     container_name: registry
     restart: always
     volumes:
-      - registry:/etc/registry
+      - harbor_registry:/etc/registry
       - ${data_registry}:/storage
     environment:
       - GODEBUG=netdns=cgo
@@ -86,7 +86,7 @@ services:
       - GODEBUG=netdns=cgo
       - PROJECT_CREATION_RESRICTION=everyone
     volumes:
-      - adminserver:/etc/adminserver
+      - harbor_adminserver:/etc/adminserver
       - ${data_registry}:/data
     links:
       - setupswrapper
@@ -107,7 +107,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - ui:/etc/ui
+      - harbor_ui:/etc/ui
     links:
       - setupswrapper
       - adminserver
@@ -129,7 +129,7 @@ services:
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
     volumes:
-      - jobservice:/etc/jobservice
+      - harbor_jobservice:/etc/jobservice
     links:
       - setupswrapper
       - adminserver
