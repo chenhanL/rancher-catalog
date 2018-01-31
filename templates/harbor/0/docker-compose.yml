@@ -14,7 +14,7 @@ volumes:
     driver: ${volumedriver}
 services:
   setupswrapper:
-    image: chuckey/harbor-setupwrapper:v1.2.2
+    image: chuckey/harbor-setupswrapper:v1.2.2
     container_name: setupswrapper
     restart: always
     volumes:
@@ -24,7 +24,7 @@ services:
       - ui:/etc/ui
     environment:
       - REGISTRY_CONFIG=${registry_config}
-    command: ["/harbor/setupswrapper.sh"]
+    command: ["/harbor/harbor-setupswrapper.sh"]
     network_mode: "none"
     logging:
       driver: "json-file"
