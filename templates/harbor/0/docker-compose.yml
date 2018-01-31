@@ -18,10 +18,10 @@ services:
     container_name: setupswrapper
     restart: always
     volumes:
-      -harbor_adminserver:/etc/adminserver
-      -harbor_jobservice:/etc/jobservice
-      -harbor_registry:/etc/registry
-      -harbor_ui:/etc/ui
+      - harbor_adminserver:/etc/adminserver
+      - harbor_jobservice:/etc/jobservice
+      - harbor_registry:/etc/registry
+      - harbor_ui:/etc/ui
     environment:
       - REGISTRY_CONFIG=${registry_config}
     command: ["/harbor/harbor-setupswrapper.sh"]
