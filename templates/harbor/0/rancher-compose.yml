@@ -80,12 +80,19 @@ version: '2'
       options:
         - db_auth
         - ldap_auth
+    - variable: "registry_config"
+      description: "Harbor registry config file"
+      label: "Config:"
+      required: true
+      type: "multiline"
     - variable: "data_registry"
-      description: "Harbor registry storage path:(only for filesystem storage in config.yml)"
+      description: "Harbor registry storage path:(for filesystem storage in config.yml)"
       label: "StoragePath:"
       required: true
       type: "string"
 services:
+  setupswrapper:
+    scale: 1
   registry:
     scale: 1
   adminserver:
