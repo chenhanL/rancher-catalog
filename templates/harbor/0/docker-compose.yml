@@ -84,7 +84,7 @@ services:
       - TOKEN_EXPIRATION=30
       - CFG_EXPIRATION=5
       - GODEBUG=netdns=cgo
-      - PROJECT_CREATION_RESRICTION=everyone
+      - PROJECT_CREATION_RESTRICTION=everyone
     volumes:
       - harbor_adminserver:/etc/adminserver
       - ${data_registry}:/data
