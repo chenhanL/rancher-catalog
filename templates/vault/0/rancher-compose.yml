@@ -35,5 +35,5 @@ services:
     scale: 1
   vault-ui:
     scale: 1
-  setupwrapper:
+  setupswrapper:
     scale: 1

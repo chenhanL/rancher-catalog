@@ -24,7 +24,7 @@ services:
     volumes:
       - vault:/etc/vault
     links:
-      - setupwrapper
+      - setupswrapper
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
     logging:
@@ -43,7 +43,7 @@ services:
     command:
       ["master"]
     links:
-      - setupwrapper
+      - setupswrapper
       - vault
     logging:
       driver: "json-file"
