@@ -1,11 +1,12 @@
 version: '2'
 volumes: #most volumes mappings require optimization (now all volumes map all containers)
   vault:
+    external: true
     driver: ${volumedriver}
 services:
-  setupwrapper:
-    image: registry.sensetime.com/sre/vault-setupwrapper:0.9.1
-    container_name: setupwrapper
+  setupswrapper:
+    image: registry.sensetime.com/sre/vault-setupswrapper:0.9.1
+    container_name: setupswrapper
     environment:
       - CONFIG=${config}
       - CERTIFICATE_KEY=${certificate_key}
