@@ -76,12 +76,11 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
   ui:
-    image: vmware/harbor-ui:v1.2.2
+    image: chuckey/harbor-ui:v1.2.2
     container_name: harbor-ui
     restart: always
     environment:
       - LOG_LEVEL=debug
-      - CONFIG_PATH=/etc/ui/app.conf
       - UI_SECRET=HvfmjXymGJsmtLaD
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
@@ -98,13 +97,6 @@ services:
         gid: '0'
         source: ui-app.conf
         target: "app.conf"
-      - mode: '0444'
-        uid: '0'
-        gid: '0'
-        source: ui-private_key.pem
-        target: "private_key.pem"
-    command:
-      ["mkdir -p /etc/ui && cp /run/secrets/private_key.pem /etc/ui/private_key.pem && /harbor/harbor_ui"]
     links:
       - adminserver
       - registry
@@ -120,7 +112,6 @@ services:
     restart: always
     environment:
       - LOG_LEVEL=debug
-      - CONFIG_PATH=/etc/jobservice/app.conf
       - UI_SECRET=HvfmjXymGJsmtLaD
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
