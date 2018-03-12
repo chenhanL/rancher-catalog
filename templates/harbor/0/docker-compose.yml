@@ -132,6 +132,11 @@ services:
       - mode: '0444'
         uid: '0'
         gid: '0'
+        source: key
+        target: "key"
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
         source: jobservice-app.conf
         target: "app.conf"
     links:
