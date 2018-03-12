@@ -4,6 +4,7 @@ services:
     image: vmware/registry:2.6.2-photon
     container_name: registry
     restart: always
+    volumes:
       - ${data_registry}:/storage
     environment:
       - GODEBUG=netdns=cgo
