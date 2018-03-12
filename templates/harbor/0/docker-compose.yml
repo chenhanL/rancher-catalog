@@ -107,7 +107,7 @@ services:
     command:
       - /bin/bash
       - -c
-      - mkdir -p /etc/ui  && cp /run/secrets/private_key.pem  /etc/ui/private_key.pem  && cd /harbor  && ./harbor-ui
+      - mkdir -p /etc/ui  && cp /run/secrets/private_key.pem  /etc/ui/private_key.pem  && cd /harbor  && ./harbor_ui
     links:
       - adminserver
       - registry
