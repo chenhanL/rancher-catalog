@@ -1,51 +1,25 @@
 version: '2'
-volumes:
-  harbor_adminserver:
-    external: true
-    driver: ${volumedriver}
-  harbor_jobservice:
-    external: true
-    driver: ${volumedriver}
-  harbor_registry:
-    external: true
-    driver: ${volumedriver}
-  harbor_ui:
-    external: true
-    driver: ${volumedriver}
 services:
-  setupswrapper:
-    image: chuckey/harbor-setupswrapper:v1.2.2
-    container_name: setupswrapper
-    restart: always
-    volumes:
-      - harbor_adminserver:/etc/adminserver
-      - harbor_jobservice:/etc/jobservice
-      - harbor_registry:/etc/registry
-      - harbor_ui:/etc/ui
-    environment:
-      - REGISTRY_CONFIG=${registry_config}
-    command: ["/harbor/harbor-setupswrapper.sh"]
-    network_mode: "none"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200m"
-    labels:
-      io.rancher.container.hostname_override: container_name
-      io.rancher.container.start_once: 'true'
   registry:
     image: vmware/registry:2.6.2-photon
     container_name: registry
     restart: always
-    volumes:
-      - harbor_registry:/etc/registry
       - ${data_registry}:/storage
     environment:
       - GODEBUG=netdns=cgo
+    secrets:
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: registry-config.yml
+        target: "config.yml"
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: registry-root.crt
+        target: "root.crt"
     command:
-      ["serve", "/etc/registry/config.yml"]
-    links:
-      - setupswrapper
+      ["serve", "/run/secrets/config.yml"]
     logging:
       driver: "json-file"
       options:
@@ -85,11 +59,15 @@ services:
       - CFG_EXPIRATION=5
       - GODEBUG=netdns=cgo
       - PROJECT_CREATION_RESTRICTION=everyone
+      - KEY_PATH=/run/secrets/key
     volumes:
-      - harbor_adminserver:/etc/adminserver
       - ${data_registry}:/data
-    links:
-      - setupswrapper
+    secrets:
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: key
+        target: 'key'
     logging:
       driver: "json-file"
       options:
@@ -106,10 +84,27 @@ services:
       - UI_SECRET=HvfmjXymGJsmtLaD
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
-    volumes:
-      - harbor_ui:/etc/ui
+      - KEY_PATH=/run/secrets/key
+      - CONFIG_PATH=/run/secrets/app.conf
+    secrets:
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: key
+        target: "key"
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: ui-app.conf
+        target: "app.conf"
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: ui-private_key.pem
+        target: "private_key.pem"
+    command:
+      ["cp /run/secrets/private_key.pem /etc/ui/private_key.pem && /harbor/harbor_ui"]
     links:
-      - setupswrapper
       - adminserver
       - registry
     logging:
@@ -128,10 +123,14 @@ services:
       - UI_SECRET=HvfmjXymGJsmtLaD
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
-    volumes:
-      - harbor_jobservice:/etc/jobservice
+      - CONFIG_PATH=/run/secrets/app.conf
+    secrets:
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: jobservice-app.conf
+        target: "app.conf"
     links:
-      - setupswrapper
       - adminserver
       - ui
     logging:

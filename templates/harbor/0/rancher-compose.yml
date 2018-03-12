@@ -62,15 +62,6 @@ version: '2'
       default: xxxxxx
       required: true
       type: "string"
-    - variable: "volumedriver"
-      description: "Volume Driver being used. Set rancher-nfs if you run in distributed mode"
-      label: "Volume Driver:"
-      required: true
-      default: rancher-nfs
-      type: "enum"
-      options:
-      #  - local
-        - rancher-nfs
     - variable: "auth_mode"
       description: "Harbor auth mode"
       label: "Auth Mode:"
@@ -80,19 +71,12 @@ version: '2'
       options:
         - db_auth
         - ldap_auth
-    - variable: "registry_config"
-      description: "Harbor registry config file"
-      label: "Config:"
-      required: true
-      type: "multiline"
     - variable: "data_registry"
       description: "Harbor registry storage path:(for filesystem storage in config.yml)"
       label: "StoragePath:"
       required: true
       type: "string"
 services:
-  setupswrapper:
-    scale: 1
   registry:
     scale: 1
   adminserver:
