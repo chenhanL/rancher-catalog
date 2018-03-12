@@ -76,7 +76,7 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
   ui:
-    image: chuckey/harbor-ui:v1.2.2
+    image: vmware/harbor-ui:v1.2.2
     container_name: harbor-ui
     restart: always
     environment:
@@ -97,6 +97,17 @@ services:
         gid: '0'
         source: ui-app.conf
         target: "app.conf"
+      - mode: '0444'
+        uid: '0'
+        gid: '0'
+        source: ui-private_key.pem
+        target: "private_key.pem"
+    entrypoint:
+      - nohup
+    command:
+      - /bin/bash
+      - -c
+      - mkdir -p /etc/ui  && cp /run/secrets/private_key.pem  /etc/ui/private_key.pem  && cd /harbor  && ./harbor-ui
     links:
       - adminserver
       - registry
