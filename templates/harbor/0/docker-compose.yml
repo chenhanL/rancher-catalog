@@ -104,7 +104,7 @@ services:
         source: ui-private_key.pem
         target: "private_key.pem"
     command:
-      ["cp /run/secrets/private_key.pem /etc/ui/private_key.pem && /harbor/harbor_ui"]
+      ["mkdir -p /etc/ui && cp /run/secrets/private_key.pem /etc/ui/private_key.pem && /harbor/harbor_ui"]
     links:
       - adminserver
       - registry
@@ -124,6 +124,7 @@ services:
       - UI_SECRET=HvfmjXymGJsmtLaD
       - JOBSERVICE_SECRET=txY9rX6x62qyvYXu
       - GODEBUG=netdns=cgo
+      - KEY_PATH=/run/secrets/key
       - CONFIG_PATH=/run/secrets/app.conf
     secrets:
       - mode: '0444'
