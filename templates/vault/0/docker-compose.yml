@@ -45,8 +45,11 @@ services:
     network_mode: container:vault
     volumes_from:
       - vault
+    entrypoint:
+      - /bin/sh
     command:
-      ["master"]
+      - -c
+      - mkdir -p /etc/vault && cp /run/secrets/* /etc/vault/ && run.sh master
     links:
       - vault
     logging:
