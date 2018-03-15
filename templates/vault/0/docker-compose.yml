@@ -28,12 +28,10 @@ services:
         source: vault-keys
         target: "vault_keys.txt"
     entrypoint:
-      - nohup
-    command:
       - /bin/sh
+    command:
       - -c
-      - mkdir -p /etc/vault && cp /run/secrets/* /etc/vault/
-      - run.sh
+      - mkdir -p /etc/vault && cp /run/secrets/* /etc/vault/ && run.sh
     logging:
       driver: "json-file"
       options:
