@@ -27,6 +27,8 @@ services:
         gid: '0'
         source: vault-keys
         target: "vault_keys.txt"
+    entrypoint:
+      - nohup
     command:
       - /bin/sh
       - c
