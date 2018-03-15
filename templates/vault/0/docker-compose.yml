@@ -6,6 +6,27 @@ services:
     restart: always
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
+    secrets:
+      - mode: '044'
+        uid: '0'
+        gid: '0'
+        source: vault-config.hcl
+        target: "config.hcl"
+      - mode: '044'
+        uid: '0'
+        gid: '0'
+        source: vault-server.crt
+        target: "server.crt"
+      - mode: '044'
+        uid: '0'
+        gid: '0'
+        source: vault-server.key
+        target: "server.key"
+      - mode: '044'
+        uid: '0'
+        gid: '0'
+        source: vault-keys
+        target: "vault_keys.txt"
     command:
       - /bin/sh
       - c
