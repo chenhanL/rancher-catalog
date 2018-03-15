@@ -31,7 +31,7 @@ services:
       - nohup
     command:
       - /bin/sh
-      - c
+      - -c
       - mkdir -p /etc/vault && cp /run/secrets/* /etc/vault/
       - run.sh
     logging:
