@@ -1,32 +1,16 @@
 version: '2'
-volumes: #most volumes mappings require optimization (now all volumes map all containers)
-  vault:
-    external: true
-    driver: ${volumedriver}
 services:
-  setupswrapper:
-    image: registry.sensetime.com/sre/vault-setupswrapper:0.9.1
-    container_name: setupswrapper
-    environment:
-      - CONFIG=${config}
-      - CERTIFICATE_KEY=${certificate_key}
-      - CERTIFICATE_CRT=${certificate_crt}
-    volumes:
-      - vault:/etc/vault
-    network_mode: "none"
-    labels:
-      io.rancher.container.hostname_override: container_name
-      io.rancher.container.start_once: 'true'
   vault:
     image: registry.sensetime.com/sre/vault:0.9.1
     container_name: vault
     restart: always
-    volumes:
-      - vault:/etc/vault
-    links:
-      - setupswrapper
     extra_hosts:
       - "vault.sensetime.com:127.0.0.1"
+    command:
+      - /bin/sh
+      - c
+      - mkdir -p /etc/vault && cp /run/secrets/* /etc/vault/
+      - run.sh
     logging:
       driver: "json-file"
       options:
@@ -43,7 +27,6 @@ services:
     command:
       ["master"]
     links:
-      - setupswrapper
       - vault
     logging:
       driver: "json-file"
